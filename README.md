@@ -1,70 +1,20 @@
-# Getting Started with Create React App
+# RULES:
+- Dòng Let's Play khi thắng sẽ chuyển sang ALL CLEARED, khi thua sẽ chuyển sang GAME OVER.
+- Ô input bên cạnh Points sẽ được điền số bóng vào để chơi
+- Time đếm tổng thời gian chơi
+- Nút Start khi Click sẽ có những sự kiện sau: 
+    + Time bắt đầu được đếm
+    + Khung nút Start chuyển sang thành nút Restart và nút Auto play
+    + Các bóng trong ô chơi bắt đầu đếm số lần lượt
+- Khi thẻ được chuyển sang nút Restart và nút Auto Play
+    + Nút Restart có chức năng giống nút Start (bắt đầu lại game)
+    + Nút Auto play có 2 chế độ ON và OFF (mặc định là OFF). Khi được bấm ON, các bóng sẽ tự click sau 1s và cứ thế đến hết.
+- Mỗi bóng sẽ có 3s để click được đánh số lần lượt theo thứ tự. Khi click hết sẽ clear. Phải click theo thứ tự nếu không sẽ thua.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# CASES:
+- CASE 1: Các bóng xuất hiện ngẫu nhiên trong phạm vi ô trò chơi, khi người chơi bắt đầu click thì bóng mới bắt đầu đếm ngược, mỗi bóng có 3s đếm ngược.
+- CASE 2: Các bóng phải được click theo thứ tự, nếu sai sẽ GAME OVER.
+- CASE 3: Khi đang chơi và chưa hoàn thành màn, bấm nút Restart thì bóng sẽ hiện lại từ đầu và ngẫu nhiên ở những chỗ khác nhau.
+- CASE 4: Khi bật nút Autoplay, các bóng sẽ tự động sau 1s sẽ được click và cứ thế đến hết bóng.
+- CASE 5: Khi trong chế độ Autoplay, bóng đang tự động click sau đó tắt chế độ auto thì bóng sẽ dừng việc được click, khi đó người chơi tiếp tục click thì bóng mới bắt đầu đếm ngược.
+- CASE 6: Có thể input cho bao nhiêu quả bóng cũng được, miễn là nó nằm trong ô chơi game.
