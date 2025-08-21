@@ -38,7 +38,7 @@ function App() {
     setGameStatus("playing");
     setTime(0);
     setBalls(generateBalls(points));
-    setActiveBallId(null); // 👉 No countdown until the first click
+    setActiveBallId(null); // No countdown until the first click
   };
 
   const restartGame = () => {
@@ -55,6 +55,8 @@ function App() {
   useEffect(() => {
     if (gameStatus !== "playing") return;
     const t = setInterval(() => setTime((s) => s + 1), 1000);
+
+    // Cleanup Function
     return () => clearInterval(t);
   }, [gameStatus]);
 
@@ -80,6 +82,7 @@ function App() {
       }
     }, 1000);
 
+    // Cleanup Function
     return () => clearInterval(interval);
   }, [gameStatus, activeBallId]);
 
