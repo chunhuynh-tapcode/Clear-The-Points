@@ -2,17 +2,15 @@ import "./App.css";
 import { useState, useEffect, useMemo, useRef } from "react";
 
 function App() {
-  const [gameStatus, setGameStatus] = useState("idle"); // idle | playing | win | lose
+  const [gameStatus, setGameStatus] = useState("idle"); // idle | playing | paused | win | lose
   const [points, setPoints] = useState(5); // number of balls
   const [time, setTime] = useState(0); // seconds
   const [autoPlay, setAutoPlay] = useState(false);
 
-  /** Ball model
-   * { id: number, x: number (%), y: number (%), clicked: boolean, countdown: number }
-   */
+  // Ball model
   const [balls, setBalls] = useState([]);
   const [activeBallId, setActiveBallId] = useState(null); // which ball is currently
-  // Ref to store the previous points value
+  // Tham chiếu để lưu trữ giá trị điểm trước đó
   const gameRef = useRef(null);
 
   const title = useMemo(() => {
@@ -21,11 +19,11 @@ function App() {
     return "Let's Play!";
   }, [gameStatus]);
 
-  // Generate balls based on points
+  // Tạo bóng mới dựa trên số points đã nhập vào input
   const generateBalls = (count) => {
     const arr = Array.from({ length: Math.max(0, count | 0) }, (_, i) => ({
       id: i,
-      x: 8 + Math.random() * 84, // keep inside the box (percent)
+      x: 8 + Math.random() * 84,
       y: 8 + Math.random() * 84,
       clicked: false,
       countdown: 3,
@@ -33,25 +31,31 @@ function App() {
     return arr;
   };
 
-  // --- Controls
+  // Controls
   const startGame = () => {
     setGameStatus("playing");
     setTime(0);
     setBalls(generateBalls(points));
-    setActiveBallId(null); // No countdown until the first click
+    setActiveBallId(null); // Không đếm ngược cho đến khi được click vào quả bóng đầu tiên
   };
 
   const restartGame = () => {
-    // Keep autoplay setting as-is; regenerate balls & reset time
+    // Giữ nguyên cài đặt tự động chơi: Bóng được random lại trên màn hình và đặt lại thời gian
     setGameStatus("playing");
     setTime(0);
     setBalls(generateBalls(points));
-    setActiveBallId(null); // again, no countdown until next manual (or auto) click
+    setActiveBallId(null);
   };
 
-  const toggleAuto = () => setAutoPlay((v) => !v);
+  const togglePause = () => {
+    if (gameStatus === "playing") {
+      setGameStatus("paused");
+    } else if (gameStatus === "paused") {
+      setGameStatus("playing");
+    }
+  }
 
-  // --- Time ticker
+  // Time ticker
   useEffect(() => {
     if (gameStatus !== "playing") return;
     const t = setInterval(() => setTime((s) => s + 1), 1000);
@@ -60,7 +64,7 @@ function App() {
     return () => clearInterval(t);
   }, [gameStatus]);
 
-  // --- Countdown only for the ACTIVE (next) ball
+  // Đếm ngược bóng tiếp theo nhưng không đếm những quả còn lại
   useEffect(() => {
     if (gameStatus !== "playing" || activeBallId === null) return;
 
@@ -86,7 +90,9 @@ function App() {
     return () => clearInterval(interval);
   }, [gameStatus, activeBallId]);
 
-  // --- Autoplay: click next required ball every 1s while ON
+  // Autoplay: click vào mỗi quả bóng lần lượt sau mỗi 1 giây
+  const toggleAuto = () => setAutoPlay((v) => !v);
+
   useEffect(() => {
     if (!autoPlay || gameStatus !== "playing") return;
 
@@ -94,20 +100,18 @@ function App() {
       setBalls((prev) => {
         const next = prev.find((b) => !b.clicked);
         if (!next) return prev;
-        // simulate user click on the correct next ball
         handleBallClickInternal(next.id, prev);
-        return prev; // state will be updated inside handleBallClickInternal
+        return prev; // trạng thái sẽ được cập nhật bên trong hàm handleBallClickInternal
       });
     }, 1000);
 
     return () => clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoPlay, gameStatus, balls]);
 
-  // Find id of the next required ball (first not clicked)
+  // Tìm id của quả bóng chưa được click tiếp theo
   const getNextRequiredId = (arr) => arr.find((b) => !b.clicked)?.id ?? null;
 
-  // Core click handler (pure logic). Accepts optional current array to avoid double reads
+  // Xử lý logic click vào bóng
   const handleBallClickInternal = (id, current = null) => {
     if (gameStatus !== "playing") return;
 
@@ -116,7 +120,7 @@ function App() {
       const requiredId = getNextRequiredId(arr);
 
       if (id !== requiredId) {
-        // wrong order ⇒ lose
+        // Xử lý nếu không click bóng theo thứ tự sẽ thua
         if (gameStatus === "playing") {
           setGameStatus("lose");
           setActiveBallId(null);
@@ -124,12 +128,11 @@ function App() {
         return arr;
       }
 
-      // mark clicked
+      // Đánh dấu các quả bóng đã được click
       const newArr = arr.map((b) =>
         b.id === id ? { ...b, clicked: true } : b
       );
 
-      // Are we done?
       const nextRequired = getNextRequiredId(newArr);
       if (nextRequired === null) {
         setGameStatus("win");
@@ -137,7 +140,7 @@ function App() {
         return newArr;
       }
 
-      // Activate next ball's countdown (reset it to full 3s)
+      // Mỗi quả bóng sẽ được kích hoạt đếm ngược trong 3s
       setActiveBallId(nextRequired);
       return newArr.map((b) =>
         b.id === nextRequired ? { ...b, countdown: 3 } : b
@@ -145,8 +148,9 @@ function App() {
     });
   };
 
+  // Khi Autoplay được bật, người chơi sẽ không được click vào bóng
   const handleClickBall = (id) => {
-    if (autoPlay) return; // while Auto is ON, block manual clicks
+    if (autoPlay) return; 
     handleBallClickInternal(id);
   };
 
@@ -203,6 +207,7 @@ function App() {
                 >
                   Restart
                 </button>
+
                 <button
                   className={`px-4 py-2 rounded-xl border hover:bg-slate-50 ${
                     autoPlay ? "border-green-600" : "border-slate-300"
@@ -211,6 +216,17 @@ function App() {
                 >
                   Auto Play: {autoPlay ? "ON" : "OFF"}
                 </button>
+                
+                {gameStatus !== "win" && gameStatus !== "lose" && (
+                  <button
+                    className={`px-4 py-2 rounded-xl ${
+                      gameStatus === "paused" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                    }`}
+                    onClick={togglePause}
+                  >
+                    {gameStatus === "paused" ? "RESUME" : "PAUSE"}
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -228,7 +244,7 @@ function App() {
           {/* Hint when idle */}
           {balls.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center text-slate-400 select-none">
-              Game will be here
+              Click the balls in order to complete the game!
             </div>
           )}
 
@@ -241,9 +257,7 @@ function App() {
                 className={`absolute flex items-center justify-center rounded-full select-none cursor-pointer shadow-md transition-transform hover:scale-105 ${
                   ball.clicked
                     ? "bg-slate-400 text-white"
-                    : isActive
-                    ? "bg-emerald-500 text-white"
-                    : "bg-sky-500 text-white"
+                    : "bg-orange-500 text-white"
                 }`}
                 style={{
                   width: 48,
@@ -269,20 +283,24 @@ function App() {
           })}
         </div>
 
-        {/* Small legend */}
-        <div className="mt-4 text-xs text-slate-500 flex items-center gap-2 flex-wrap">
-          <span className="inline-flex items-center gap-1">
-            <span className="w-3 h-3 inline-block rounded-full bg-sky-500"></span>{" "}
-            normal
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <span className="w-3 h-3 inline-block rounded-full bg-emerald-500"></span>{" "}
-            active (counting)
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <span className="w-3 h-3 inline-block rounded-full bg-slate-400"></span>{" "}
-            clicked
-          </span>
+        {/* Footnote Bar */}
+        <div className="inline-flex w-full justify-between">
+          <div className="mt-4 text-xs text-slate-500 flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1">
+              Balls left: {balls.filter((ball) => !ball.clicked).length}
+            </span>
+          </div>
+
+          <div className="mt-4 text-xs text-slate-500 flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1">
+              <span className="w-3 h-3 inline-block rounded-full bg-sky-500"></span>{" "}
+              normal
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="w-3 h-3 inline-block rounded-full bg-slate-400"></span>{" "}
+              clicked
+            </span>
+          </div>
         </div>
       </div>
     </div>

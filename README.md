@@ -18,3 +18,7 @@
 - CASE 4: Khi bật nút Autoplay, các bóng sẽ tự động sau 1s sẽ được click và cứ thế đến hết bóng.
 - CASE 5: Khi trong chế độ Autoplay, bóng đang tự động click sau đó tắt chế độ auto thì bóng sẽ dừng việc được click, khi đó người chơi tiếp tục click thì bóng mới bắt đầu đếm ngược.
 - CASE 6: Có thể input cho bao nhiêu quả bóng cũng được, miễn là nó nằm trong ô chơi game.
+
+# UPDATE:
+- Update lại UI bằng tailwindcss
+- Thêm nút PAUSE/RESUME với chức năng bật tắt chuyển đổi giữa 2 trạng thái. Khi click PAUSE thời gian tổng và trên bóng sẽ dừng đếm ngược, click RESUME sẽ trở lại trạng thái tiếp tục playing.
