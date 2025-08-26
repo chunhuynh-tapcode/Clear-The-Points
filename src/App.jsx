@@ -20,25 +20,30 @@ function App() {
   }, [gameStatus]);
 
   // Tạo bóng mới dựa trên số points đã nhập vào input
-  const generateBalls = (count) => {
-    const arr = Array.from({ length: Math.max(0, count | 0) }, (_, i) => ({
+  const generateBalls = (num) => {
+    const maxBalls = 10000; // ✅ giới hạn tối đa
+    const count = Math.min(num, maxBalls); // lấy số nhỏ hơn giữa num và maxBalls
+    return Array.from({ length: count }, (_, i) => ({
       id: i,
-      x: 8 + Math.random() * 84,
-      y: 8 + Math.random() * 84,
-      clicked: false,
+      x: Math.random() * 90 + 5,
+      y: Math.random() * 80 + 10,
       countdown: 3,
+      clicked: false,
     }));
-    return arr;
-  };
+};
 
   // Controls
   const startGame = () => {
-    setGameStatus("playing");
-    setTime(0);
+    if (points <= 0) return;
+    if (points > 10000) {
+      alert("Game chỉ hỗ trợ tối đa 10,000 bóng!");
+      return;
+    }
     setBalls(generateBalls(points));
-    setActiveBallId(null); // Không đếm ngược cho đến khi được click vào quả bóng đầu tiên
+    setActiveBallId(0);
+    setGameStatus("playing");
   };
-
+  
   const restartGame = () => {
     // Giữ nguyên cài đặt tự động chơi: Bóng được random lại trên màn hình và đặt lại thời gian
     setGameStatus("playing");
@@ -265,6 +270,7 @@ function App() {
                   left: `${ball.x}%`,
                   top: `${ball.y}%`,
                   transform: "translate(-50%, -50%)",
+                  zIndex: 9999 - ball.id
                 }}
                 title={
                   ball.clicked
